@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>PMT Terminal</title>
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="pmt-terminal/css/terminal.css"/>
+</head>
+<body>
+
+<!-- ══ STARTUP MODAL ══ -->
+<div id="modal">
+  <div id="mbox">
+    <h1>PMT <em>Terminal</em></h1>
+    <div class="mrow">
+      Two API keys are required. Get free keys at the links below.<br>
+      <span style="font-size:11px;opacity:.8">Price loads once, then chart grows from real-time data.</span>
+    </div>
+    <div id="mkey-hint" class="mkey-hint" title="We recommend requesting the free tier at each provider — no credit card required.">
+      <span class="mkey-hint-icon">ℹ</span>
+      <span class="mkey-hint-text">Hover here: free API tiers are recommended and easy to request.</span>
+    </div>
+    <div class="mfield">
+      <label>Finnhub API Key <span>(required)</span></label>
+      <input class="minput" id="m-key" type="text" placeholder="Finnhub key from finnhub.io" autocomplete="off" spellcheck="false"/>
+    </div>
+    <div class="mfield">
+      <label>Massive API Key <span>(required)</span></label>
+      <input class="minput" id="massive-key" type="text" placeholder="Massive key from massive.com" autocomplete="off" spellcheck="false"/>
+    </div>
+    <div>
+      <div class="mtest-row">
+        <div id="mtest" style="flex:1">
+          <div id="mtd"></div>
+          <div id="mtxt">Enter both keys above, then test</div>
+        </div>
+        <button id="mtest-btn" onclick="testKeys()">Test Keys</button>
+      </div>
+    </div>
+    <button id="mgo" onclick="launch()">Launch Terminal →</button>
+    <p class="mnote">Free tiers: <a href="https://finnhub.io" target="_blank">finnhub.io</a> · <a href="https://massive.com" target="_blank">massive.com</a></p>
+  </div>
+</div>
+
+<!-- ── TICKER TAPE ── -->
+<div id="tape"><div id="tape-track"><!-- JS --></div></div>
+
+<!-- ── TOPBAR ── -->
+<div id="bar">
+  <div id="logo"><div class="dot-pulse"></div>PMT <em>Terminal</em></div>
+  <button class="nb on" onclick="switchView('cv',this)">Charts</button>
+  <button class="nb" onclick="switchView('bv',this)">Backtest</button>
+  <div id="rbar">
+    <button id="theme-btn" onclick="cycleTheme()" title="Switch UI theme — Dark / Gray / Light">Dark</button>
+    <div id="api-pill" onclick="document.getElementById('modal').style.display='flex'" title="Click to change API key">
+      <div class="apd" id="apd"></div>
+      <span id="apl">Not connected</span>
+    </div>
+    <div id="clock">--:--:-- UTC</div>
+  </div>
+</div>
+
+<div id="ws">
+
+  <!-- ══ CHART VIEW ══ -->
+  <div class="view on" id="cv">
+    <div id="cmain">
+      <!-- Symbol bar -->
+      <div id="sb">
+        <div id="sw">
+          <input id="si" type="text" placeholder="AAPL or FX / EQT / CRPT" autocomplete="off" spellcheck="false"/>
+          <div id="sd"></div>
+        </div>
+        <div id="cpx">
+          <div id="px">—</div>
+          <div id="pch">—</div>
+        </div>
+        <div id="sym-type" style="display:none"></div>
+        <div class="ohlc">
+          <div class="oi">O <b id="oo">—</b></div>
+          <div class="oi">H <b id="oh">—</b></div>
+          <div class="oi">L <b id="ol">—</b></div>
+          <div class="oi">C <b id="oc">—</b></div>
+          <div class="oi">V <b id="ov">—</b></div>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div id="tb">
+        <div class="tg" id="tfg">
+          <button class="tbtn tf" data-i="0" title="1 Day — 5-minute candles for intraday action">1D</button>
+          <button class="tbtn tf" data-i="1" title="5 Days — 15-minute candles for the trading week">5D</button>
+          <button class="tbtn tf" data-i="2" title="1 Month — hourly candles for short-term trends">1M</button>
+          <button class="tbtn tf on" data-i="3" title="3 Months — daily candles for medium-term view">3M</button>
+          <button class="tbtn tf" data-i="4" title="6 Months — daily candles for swing trading">6M</button>
+          <button class="tbtn tf" data-i="5" title="1 Year — daily candles for long-term trends">1Y</button>
+          <button class="tbtn tf" data-i="6" title="5 Years — weekly candles for macro perspective">5Y</button>
+        </div>
+        <div class="sep"></div>
+        <div class="tg" id="tyg">
+          <button class="tbtn on" data-type="candlestick" title="Candlestick — traditional OHLC candles showing open, high, low, close">▓</button>
+          <button class="tbtn" data-type="line" title="Line — simple closing-price line for a clean trend view">╱</button>
+          <button class="tbtn" data-type="bar" title="Bar — OHLC bars, compact alternative to candlesticks">┃</button>
+          <button class="tbtn" data-type="area" title="Area — filled area under the closing price for quick visual">◿</button>
+        </div>
+        <div class="sep"></div>
+        <div class="tg" style="position:relative">
+          <button class="tbtn" id="i-rsi" onclick="tind('rsi')" title="RSI — Relative Strength Index, shows overbought/oversold momentum">RSI</button>
+          <button class="tbtn" id="i-macd" onclick="tind('macd')" title="MACD — Moving Average Convergence Divergence, tracks trend shifts">MACD</button>
+          <button class="tbtn" onclick="tis()" title="Indicator settings — adjust periods and parameters">⚙</button>
+          <div id="is">
+            <div class="isec">RSI</div>
+            <div class="ir"><label>Period</label><input type="number" id="rp2" value="14" min="2" max="100" onchange="ri()"/></div>
+          </div>
+        </div>
+        <div class="sep"></div>
+        <div class="tg">
+          <button class="tbtn" onclick="toggleDraw('hline')" id="d-hline" title="Horizontal Line — draw a fixed price level across the chart">H-Line</button>
+          <button class="tbtn" onclick="toggleDraw('trend')" id="d-trend" title="Trend Line — draw a diagonal line between two price points">Trend</button>
+          <button class="tbtn" onclick="toggleDraw('fib')" id="d-fib" title="Fibonacci Retracement — plot key support/resistance levels">Fib</button>
+          <button class="tbtn" onclick="clearDrawings()" title="Clear all drawings from the chart">Clear</button>
+        </div>
+        <button id="bt-link" onclick="goBacktest()" title="Run a backtest on the current symbol">Backtest this →</button>
+      </div>
+
+      <!-- Chart area -->
+      <div id="ca" style="position:relative">
+        <canvas id="dc"></canvas>
+        <div id="quote-only-msg" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;flex-direction:column;gap:8px;background:var(--bg);z-index:2;font-family:var(--sans);color:var(--dim);text-align:center;padding:24px">
+          <h3 style="font-size:18px;color:var(--hi);margin:0" id="quote-only-sym">—</h3>
+          <p style="margin:0;font-size:12px">Enter a symbol above. Chart builds from live data.</p>
+        </div>
+        <div class="cp" id="mp" style="flex:1;min-height:0">
+          <div id="ce"><h3>PMT Terminal</h3><p>Enter a symbol above</p></div>
+        </div>
+        <div class="cp" id="rp">
+          <div class="pl">RSI<span id="rsiv"></span></div>
+        </div>
+        <div class="cp" id="macp">
+          <div class="pl">MACD</div>
+        </div>
+      </div>
+
+      <!-- Industry & asset analytics (scrollable below chart) -->
+      <div id="analytics-panel">
+        <div class="resize-h-top" data-resize="analytics-panel" data-dir="top"></div>
+        <div class="ap-head">
+          <span class="ap-title">Industry & asset analytics</span>
+        </div>
+        <div class="ap-scroll">
+          <section class="ap-section">
+            <div class="ap-section-title">Sector heatmap</div>
+            <div id="sector-heatmap" class="heatmap"></div>
+          </section>
+          <section class="ap-section">
+            <div class="ap-section-title">Asset classes</div>
+            <div id="asset-classes" class="asset-grid"></div>
+          </section>
+          <section class="ap-section">
+            <div class="ap-section-title">Industry performance</div>
+            <div id="industry-list" class="industry-list"></div>
+          </section>
+          <section class="ap-section" id="massive-snapshot" style="display:none"></section>
+        </div>
+      </div>
+    </div>
+
+    <!-- News Sidebar -->
+    <div id="ns">
+      <div class="resize-h-left" data-resize="ns" data-dir="left"></div>
+      <!-- Live stream panel -->
+      <div id="sp">
+        <div id="sh">
+          <div class="pt">Live Stream</div>
+          <span id="nb2" style="font-size:8px;color:var(--dim);margin-left:4px"></span>
+          <button id="stog" onclick="toggleStream()">▾</button>
+        </div>
+        <div id="stream-wrap">
+          <div id="stream-inner">
+            <iframe id="stream-frame" allowfullscreen allow="autoplay;encrypted-media"></iframe>
+            <div id="stream-blocked">
+              <p>This stream blocks direct embeds.<br>Watch it on their official page instead.</p>
+              <a id="stream-ext" href="#" target="_blank" class="open-btn">Open Stream ↗</a>
+            </div>
+          </div>
+          <div id="stream-url-row">
+            <input id="sui" type="text" placeholder="YouTube URL or video ID…"/>
+            <button onclick="loadCustomStream()">▶</button>
+          </div>
+          <div id="stream-links">
+            <button class="sl-btn" onclick="loadStream('france24')">France 24</button>
+            <button class="sl-btn" onclick="loadStream('al-jazeera')">Al Jazeera</button>
+            <button class="sl-btn" onclick="loadStream('yahoo')">Yahoo</button>
+            <button class="sl-btn" onclick="loadStream('bloomberg')">Bloomberg</button>
+            <button class="sl-btn" onclick="loadStream('cnbc')">CNBC</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- News feed -->
+      <div id="nh">
+        <div class="nhr">
+          <div class="pt">Market News</div>
+          <div class="live-badge">● LIVE</div>
+        </div>
+        <div id="nf">
+          <button class="nfb on" onclick="setNF(this,'all')">All</button>
+          <button class="nfb" onclick="setNF(this,'general')">General</button>
+          <button class="nfb" onclick="setNF(this,'forex')">Forex</button>
+          <button class="nfb" onclick="setNF(this,'crypto')">Crypto</button>
+          <button class="nfb" onclick="setNF(this,'merger')">M&amp;A</button>
+          <button class="nfb" onclick="setNF(this,'urgent')">⚡ Urgent</button>
+        </div>
+      </div>
+      <div id="nfeed">
+        <div id="nload"><div class="spin"></div><span style="font-size:10px;color:var(--dim)">Loading news…</span></div>
+      </div>
+      <div id="news-err">
+        <p>News failed to load.<br>Check your API key or try refreshing.<br><a href="#" onclick="pollNews();return false;">Retry</a></p>
+      </div>
+    </div>
+  </div><!-- /cv -->
+
+  <!-- ══ BACKTEST VIEW ══ -->
+  <div class="view" id="bv">
+    <div id="cfgp">
+      <div class="resize-h-right" data-resize="cfgp" data-dir="right"></div>
+      <div class="cs">
+        <div class="ct">Symbol</div>
+        <div class="cr"><div class="cl">Symbol</div><input class="ci" id="bs" type="text" value="AAPL" spellcheck="false"/></div>
+        <div class="cr" style="font-size:10px;color:var(--dim)">Uses live data from Charts. Load symbol there first, wait for 30+ ticks.</div>
+      </div>
+      <div class="cs">
+        <div class="ct">Capital</div>
+        <div class="cr"><div class="cl">Starting Capital ($)</div><input class="ci" id="bc" type="number" value="10000" min="100"/></div>
+        <div class="cr"><div class="cl">Position Size (%)</div><input class="ci" id="pps" type="number" value="100" min="1" max="100"/></div>
+        <div class="cr"><div class="cl">Commission (%)</div><input class="ci" id="pcom" type="number" value="0.1" min="0" max="5" step="0.05"/></div>
+      </div>
+      <div class="cs">
+        <div class="ct">Strategy</div>
+        <div id="stabs">
+          <button class="st on" onclick="ss('rsi',this)">RSI</button>
+          <button class="st" onclick="ss('macd',this)">MACD</button>
+          <button class="st" onclick="ss('custom',this)">Custom</button>
+        </div>
+        <!-- RSI params -->
+        <div class="pb vis" id="p-rsi">
+          <div class="cr r2">
+            <div class="cf"><div class="cl">Oversold</div><input class="ci" id="ros" type="number" value="30" min="10" max="45"/></div>
+            <div class="cf"><div class="cl">Overbought</div><input class="ci" id="rob" type="number" value="70" min="55" max="90"/></div>
+          </div>
+        </div>
+        <!-- MACD params (no extra config needed) -->
+        <div class="pb" id="p-macd"><div style="font-size:10px;color:var(--dim);padding:4px 0">Uses default 12/26/9 MACD. Trades signal-line crossovers.</div></div>
+        <!-- Custom -->
+        <div class="pb" id="p-custom">
+          <div class="cr"><div class="cl">Custom Signal Function</div>
+            <textarea class="ci" id="ce-editor" style="min-height:150px;resize:vertical;line-height:1.65;tab-size:2">// Return 'buy', 'sell', or null
+// Available: i, data[i], ind[i]
+// ind keys: rsi14, macd, macdSignal
+function signal(i, data, ind) {
+  const c = ind[i], p = ind[i - 1];
+  if (!c || !p) return null;
+  if (c.rsi14 != null && c.rsi14 < 30) return 'buy';
+  if (c.rsi14 != null && c.rsi14 > 70) return 'sell';
+  return null;
+}</textarea>
+          </div>
+          <div class="ch">Access <code>data[i]</code> (OHLCV) and <code>ind[i]</code> (indicators). Return <code>'buy'</code>, <code>'sell'</code>, or <code>null</code>.</div>
+        </div>
+      </div>
+      <div class="cs">
+        <button id="rbtn" onclick="runBacktest()">▶ Run strategy</button>
+        <div id="rst"></div>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div id="resp">
+      <div id="empty" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px">
+        <div style="font-family:var(--sans);font-size:14px;color:var(--dim);opacity:.3">No backtest run yet</div>
+        <div style="font-size:10px;opacity:.15">Configure parameters and click Run</div>
+      </div>
+      <div id="rc" style="display:none;flex-direction:column;flex:1">
+        <!-- Summary scorecards -->
+        <div id="scs">
+          <div class="sc"><div class="sl">Total Return</div><div class="sv neu" id="sr">—</div><div class="sa" id="sra"></div></div>
+          <div class="sc"><div class="sl">Sharpe</div><div class="sv neu" id="ssh">—</div><div class="sa" id="ssrk"></div></div>
+          <div class="sc"><div class="sl">Max Drawdown</div><div class="sv neu" id="smd">—</div><div class="sa" id="smda"></div></div>
+          <div class="sc"><div class="sl">CAGR</div><div class="sv neu" id="sc2">—</div><div class="sa" id="sy"></div></div>
+        </div>
+        <div id="scs2">
+          <div class="sc"><div class="sl">Trades</div><div class="sv neu" id="st2">—</div></div>
+          <div class="sc"><div class="sl">Win Rate</div><div class="sv neu" id="swr">—</div></div>
+          <div class="sc"><div class="sl">Avg Win</div><div class="sv neu" id="saw">—</div></div>
+          <div class="sc"><div class="sl">Avg Loss</div><div class="sv neu" id="sal">—</div></div>
+          <div class="sc"><div class="sl">Profit Factor</div><div class="sv neu" id="spf">—</div></div>
+        </div>
+        <!-- Charts -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);flex-shrink:0;height:160px">
+          <div style="background:var(--bg);position:relative">
+            <div class="pl">Equity Curve<span id="eqv"></span></div>
+            <div id="ep" style="width:100%;height:100%"></div>
+          </div>
+          <div style="background:var(--bg);position:relative">
+            <div class="pl">Drawdown<span id="ddv"></span></div>
+            <div id="dp" style="width:100%;height:100%"></div>
+          </div>
+        </div>
+        <!-- Trade log -->
+        <div style="display:flex;align-items:center;padding:5px 13px;background:var(--surface);border-top:1px solid var(--border);gap:8px;flex-shrink:0">
+          <div style="font-family:var(--sans);font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim)">Trade Log</div>
+          <div id="tcnt" style="font-size:9px;color:var(--dim)"></div>
+          <button id="bt-export" onclick="exportCSV()" style="margin-left:auto;font-size:9px;padding:3px 9px;background:var(--border);border:1px solid var(--bhi);color:var(--dim);border-radius:3px;letter-spacing:.3px">Export CSV</button>
+        </div>
+        <div style="overflow-y:auto;max-height:200px">
+          <table id="ttable" style="width:100%;border-collapse:collapse;font-size:10px">
+            <thead>
+              <tr style="background:var(--surface);position:sticky;top:0">
+                <th class="th">#</th><th class="th">Type</th><th class="th">Entry</th><th class="th">Price</th>
+                <th class="th">Exit</th><th class="th">Price</th><th class="th">Return</th><th class="th">P&amp;L</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <!-- ── Analytics breakdown (rendered after backtest) ── -->
+        <div id="an-c" style="display:none">
+          <div id="an-hd">
+            <div>
+              <div style="font-family:var(--sans);font-size:18px;font-weight:800;color:var(--hi)" id="an-ttl">—</div>
+              <div style="font-size:10px;color:var(--dim);margin-top:2px" id="an-sub">—</div>
+            </div>
+          </div>
+          <div id="an-grid"></div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /bv -->
+
+</div><!-- /ws -->
+
+<!-- Scripts — load order matters -->
+<script src="pmt-terminal/js/config.js"></script>
+<script src="pmt-terminal/js/utils.js"></script>
+<script src="pmt-terminal/js/api.js"></script>
+<script src="pmt-terminal/js/chart.js"></script>
+<script src="pmt-terminal/js/news.js"></script>
+<script src="pmt-terminal/js/backtest.js"></script>
+<script src="pmt-terminal/js/analytics.js"></script>
+</body>
+</html>

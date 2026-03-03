@@ -1,0 +1,12 @@
+# ─── SECRETS ───────────────────────
+api/config.php
+
+# ─── CACHE ──────────────────────────
+.cache/
+
+# ─── OS / EDITOR ────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/

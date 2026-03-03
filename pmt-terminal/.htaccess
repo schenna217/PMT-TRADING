@@ -1,0 +1,25 @@
+# ─────────────────────────────────────
+#  .htaccess — security rules
+# ─────────────────────────────────────
+
+# Block direct access to config.php
+<Files "config.php">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Block access to cache directory
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^\.cache/ - [F,L]
+</IfModule>
+
+# Prevent directory listing
+Options -Indexes
+
+# Security headers
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
