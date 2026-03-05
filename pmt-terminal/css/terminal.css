@@ -342,6 +342,8 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 .mkey-hint:hover{background:var(--bhi);border-color:var(--g);color:var(--tx)}
 .mkey-hint-icon{opacity:.8;font-style:italic}
 .mkey-hint-text{flex:1}
+.mfield-info{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;margin-left:2px;font-size:10px;font-style:italic;color:var(--dim);cursor:help;border-radius:50%;background:var(--border);vertical-align:middle;opacity:1}
+.mfield-info:hover{color:var(--g);background:var(--bhi)}
 .mnote a{color:var(--g);text-decoration:none}
 .mnote a:hover{text-decoration:underline}
 .mfield{display:flex;flex-direction:column;gap:5px}
@@ -363,3 +365,63 @@ tbody tr:hover td{background:rgba(255,255,255,.02)}
 #mgo.active{opacity:1;pointer-events:all}
 #mgo.active:hover{opacity:.87}
 .mnote{font-size:10px;color:var(--dim);text-align:center}
+
+/* ══════════════════ "ARE YOU BORED?" ARCADE VIEW ══════════════════ */
+#gv{flex-direction:column}
+#bored-root{flex:1;display:flex;flex-direction:column;padding:16px 18px;gap:14px;overflow:hidden}
+.arcade-header{display:flex;flex-direction:column;gap:6px}
+.arcade-title{display:flex;align-items:center;gap:10px;font-family:var(--sans);font-size:18px;font-weight:800;color:var(--hi);letter-spacing:.3px}
+.arcade-title span:first-child{text-transform:uppercase;letter-spacing:1.4px;font-size:13px;opacity:.85}
+.arcade-pill{font-size:9px;padding:3px 9px;border-radius:999px;border:1px solid var(--bhi);background:linear-gradient(120deg,var(--bd),transparent);color:var(--b);letter-spacing:.5px;text-transform:uppercase}
+.arcade-sub{font-size:11px;color:var(--dim);max-width:640px}
+.arcade-layout{flex:1;display:flex;gap:12px;min-height:0}
+.arcade-left{width:260px;min-width:230px;display:flex;flex-direction:column;gap:10px}
+.arcade-right{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0}
+.arcade-card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:11px 13px;display:flex;flex-direction:column;gap:8px;box-shadow:0 10px 30px #0007}
+.arcade-card-title{font-family:var(--sans);font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim)}
+.arcade-field{display:flex;flex-direction:column;gap:4px;margin-top:2px}
+.arcade-field label{font-size:10px;color:var(--dim);letter-spacing:.4px}
+.arcade-hint{font-size:9px;color:var(--dim);opacity:.8}
+.arcade-status{font-size:10px;color:var(--dim);margin-top:4px;min-height:14px}
+.arcade-status.err{color:var(--r)}
+.arcade-status.ok{color:var(--g)}
+.arcade-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto}
+.arcade-player{display:flex;align-items:center;justify-content:space-between;font-size:10px;padding:5px 7px;border-radius:4px;background:var(--bg);border:1px solid transparent}
+.arcade-player.me{border-color:var(--g);background:var(--gd)}
+.arcade-player-name{color:var(--hi);font-family:var(--sans);font-size:11px}
+.arcade-player-stack{color:var(--dim);font-size:10px}
+.arcade-player-state{color:var(--a);font-size:9px}
+.arcade-table{flex:1;min-height:0}
+.arcade-table-status{font-size:10px;color:var(--dim);margin-bottom:4px}
+.arcade-table-view{flex:1;min-height:0;border-radius:6px;background:radial-gradient(circle at top,var(--bd),var(--bg));border:1px solid var(--border);padding:10px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.arcade-table-placeholder{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;color:var(--dim)}
+.arcade-table-logo{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 30% 0,var(--g),var(--bd));color:#05060a;font-family:var(--sans);font-weight:800;font-size:15px;box-shadow:0 0 18px #00e5a044}
+.arcade-howto{font-size:10px;color:var(--dim);line-height:1.75}
+.arcade-howto ol{padding-left:17px;margin:4px 0}
+.arcade-howto li{margin-bottom:2px}
+
+.bored-table-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1.4fr);gap:10px;align-items:flex-start;min-height:0}
+.arcade-community{background:color-mix(in srgb,var(--border) 55%,transparent);border-radius:5px;padding:8px;display:flex;flex-direction:column;gap:6px}
+.arcade-section-label{font-size:9px;color:var(--dim);letter-spacing:.5px;text-transform:uppercase}
+.arcade-cards{display:flex;gap:4px;flex-wrap:wrap}
+.card{width:32px;height:44px;border-radius:4px;background:linear-gradient(135deg,#141824,#1f2432);border:1px solid #444b5e;display:flex;align-items:center;justify-content:center;font-size:14px;font-family:var(--sans);color:#f5f6fb;box-shadow:0 8px 18px rgba(0,0,0,.55)}
+.card:nth-child(odd){transform:translateY(-1px)}
+.card:nth-child(even){transform:translateY(1px)}
+.bored-seats{background:color-mix(in srgb,var(--bg) 85%,transparent);border-radius:5px;padding:8px;display:flex;flex-direction:column;gap:6px;overflow-y:auto;max-height:220px}
+.bored-seat{border-radius:4px;padding:5px 7px;display:flex;flex-direction:column;gap:3px;border:1px solid transparent;background:rgba(0,0,0,.25)}
+.bored-seat.me{border-color:var(--g);background:color-mix(in srgb,var(--gd) 65%, transparent)}
+.bored-seat-head{display:flex;align-items:center;justify-content:space-between;font-size:10px}
+.seat-name{font-family:var(--sans);font-size:11px;color:var(--hi)}
+.seat-meta{font-size:9px;color:var(--dim)}
+.bored-seat-cards{display:flex;gap:4px}
+.bored-seat-cards .card{width:30px;height:40px}
+.bored-actions{margin-top:4px;display:flex;gap:8px;justify-content:flex-start}
+.bored-actions button{font-size:10px;padding:5px 11px;border-radius:4px;border:1px solid var(--bhi);background:var(--border);color:var(--hi);cursor:pointer;letter-spacing:.4px;text-transform:uppercase;transition:all .15s}
+.bored-actions button:hover{background:var(--bhi);border-color:var(--a);color:var(--hi)}
+.bored-actions button:last-child{border-color:var(--g);color:var(--g)}
+.bored-actions button:last-child:hover{background:var(--gd)}
+.bored-actions-muted{font-size:9px;color:var(--dim);opacity:.8;align-items:center}
+.bored-log{margin-top:4px;padding:6px 8px;border-radius:4px;background:rgba(0,0,0,.35);border:1px solid var(--border);font-size:9px;color:var(--dim);max-height:80px;overflow-y:auto}
+.bored-log-line{margin-bottom:2px}
+.bored-log-line:last-child{margin-bottom:0}
+.bored-log-line.muted{opacity:.6}

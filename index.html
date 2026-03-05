@@ -15,20 +15,26 @@
 <div id="modal">
   <div id="mbox">
     <h1>PMT <em>Terminal</em></h1>
+    <div class="mrow" style="font-size:11px;opacity:.9;margin-top:4px">
+      By <a href="https://www.linkedin.com/in/tuong-max-le" target="_blank" style="color:inherit;text-decoration:underline"><strong>Tuong Max Le</strong></a> ·
+      <a href="https://www.linkedin.com/company/portfolio-management-team/about/" target="_blank" style="color:inherit;text-decoration:underline">
+        PMT
+      </a>
+      ·
+      <a href="https://acm-uic.github.io/sigs/algotrading/" target="_blank" style="color:inherit;text-decoration:underline">
+        ACM@UIC SIG Algorithmic Trading
+      </a>
+    </div>
     <div class="mrow">
       Two API keys are required. Get free keys at the links below.<br>
       <span style="font-size:11px;opacity:.8">Price loads once, then chart grows from real-time data.</span>
     </div>
-    <div id="mkey-hint" class="mkey-hint" title="We recommend requesting the free tier at each provider — no credit card required.">
-      <span class="mkey-hint-icon">ℹ</span>
-      <span class="mkey-hint-text">Hover here: free API tiers are recommended and easy to request.</span>
-    </div>
     <div class="mfield">
-      <label>Finnhub API Key <span>(required)</span></label>
+      <label>Finnhub API Key <span class="mfield-info" title="We recommend requesting the free tier — no credit card required.">ℹ</span> <span>(required)</span></label>
       <input class="minput" id="m-key" type="text" placeholder="Finnhub key from finnhub.io" autocomplete="off" spellcheck="false"/>
     </div>
     <div class="mfield">
-      <label>Massive API Key <span>(required)</span></label>
+      <label>Massive API Key <span class="mfield-info" title="We recommend requesting the free tier — no credit card required.">ℹ</span> <span>(required)</span></label>
       <input class="minput" id="massive-key" type="text" placeholder="Massive key from massive.com" autocomplete="off" spellcheck="false"/>
     </div>
     <div>
@@ -53,6 +59,7 @@
   <div id="logo"><div class="dot-pulse"></div>PMT <em>Terminal</em></div>
   <button class="nb on" onclick="switchView('cv',this)">Charts</button>
   <button class="nb" onclick="switchView('bv',this)">Backtest</button>
+  <button class="nb" onclick="switchView('gv',this)">Are You Bored?</button>
   <div id="rbar">
     <button id="theme-btn" onclick="cycleTheme()" title="Switch UI theme — Dark / Gray / Light">Dark</button>
     <div id="api-pill" onclick="document.getElementById('modal').style.display='flex'" title="Click to change API key">
@@ -252,9 +259,21 @@
             <div class="cf"><div class="cl">Oversold</div><input class="ci" id="ros" type="number" value="30" min="10" max="45"/></div>
             <div class="cf"><div class="cl">Overbought</div><input class="ci" id="rob" type="number" value="70" min="55" max="90"/></div>
           </div>
+          <div class="ch">
+            <strong>Entry:</strong> waits for RSI to drop below the Oversold level, then enters a long trade once RSI turns back up and crosses above Oversold&nbsp;+&nbsp;3.<br>
+            <strong>Exit:</strong> holds the position while momentum stays strong; once RSI pushes above the Overbought level and then rolls over below Overbought&nbsp;−&nbsp;3, it exits the trade.<br>
+            <strong>Intent:</strong> mean‑reversion swings after oversold/overbought extremes rather than every tiny RSI wiggle.
+          </div>
         </div>
         <!-- MACD params (no extra config needed) -->
-        <div class="pb" id="p-macd"><div style="font-size:10px;color:var(--dim);padding:4px 0">Uses default 12/26/9 MACD. Trades signal-line crossovers.</div></div>
+        <div class="pb" id="p-macd">
+          <div style="font-size:10px;color:var(--dim);line-height:1.7;padding:4px 0">
+            <strong>MACD setup:</strong> standard 12/26 EMAs with a 9‑period signal line on the MACD spread.<br>
+            <strong>Entry:</strong> when MACD was below its signal line and then crosses up through it, the strategy enters a long trade on that bar (bullish crossover).<br>
+            <strong>Exit:</strong> while in a trade, if MACD was above its signal line and then crosses down through it, the position is closed on that bar (bearish crossover).<br>
+            <strong>Intent:</strong> ride medium‑term trends, only flipping when the MACD/signal relationship actually reverses.
+          </div>
+        </div>
         <!-- Custom -->
         <div class="pb" id="p-custom">
           <div class="cr"><div class="cl">Custom Signal Function</div>
@@ -341,6 +360,11 @@ function signal(i, data, ind) {
     </div>
   </div><!-- /bv -->
 
+  <!-- ══ ARCADE VIEW ══ -->
+  <div class="view" id="gv">
+    <!-- Filled by arcade.js -->
+  </div>
+
 </div><!-- /ws -->
 
 <!-- Scripts — load order matters -->
@@ -351,5 +375,6 @@ function signal(i, data, ind) {
 <script src="pmt-terminal/js/news.js"></script>
 <script src="pmt-terminal/js/backtest.js"></script>
 <script src="pmt-terminal/js/analytics.js"></script>
+<script src="pmt-terminal/js/arcade.js"></script>
 </body>
 </html>

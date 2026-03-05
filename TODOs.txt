@@ -1,9 +1,8 @@
-PRIORITY:
-- Replace yfin server (bot blocking) → use alternative API
-
 TIMELINE:
-- Live news window (Fintech API) - DONE (fix Bloomberg Live YT URL display + equities news integration, only Crypto and FOREX atm)
-- Stock indicator window - blocked by yfin API, need alternative (get done mid next week)
-- Backtest compiler/runner - GUI exists, but can't boot up cuz above
-- Analytics dashboard - correlation matrix, drawdown, PSR, Sharpe ratio for strat feedback
-- Extra: Window layout adjustments
+- for the backtest window try to fit it cuz i think right now the historical data fetched for each stock is like 2 years and the line zoomed out too much
+- for the backtest window, try to add some explanation behind what the strategy means, like if i remember theres two strat the user can choose from but just create a short description what these strats will do, when will execute, exit
+- page that tells portfolio of different investors and breakdown of assets (insider)
+	+ news regarding those portfolios and investors/funds
+    + integrate another free api if needed, just tell me
+- LAN game page: 8-bit poker
+    + game will start if theres more than 2 people using the page hosted on github

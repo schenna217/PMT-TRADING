@@ -54,6 +54,10 @@ window.lastBT = null;
 window.ws2        = null;
 window.liveQuotes = {};
 
+// Arcade (LAN poker) WebSocket endpoint — set this to enable real multiplayer.
+// Example: wss://your-arcade-server.example.com/ws
+window.ARCADE_WS_URL = ''; // empty = disabled; UI will still render in demo mode.
+
 // ── STREAM PRESETS (channel-based live embeds — auto-resolve to current stream) ──
 window.streamChannelIds = {
   france24:    'UCQfwfsi5VrQ8yKZ-UWmAEFg',
