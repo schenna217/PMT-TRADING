@@ -9,3 +9,4 @@ TIMELINE:
 - Additional ideas
     + DCF Calculator
 	+ IPO/Sec filings calendar
+	+ LAN/server friendly to allow user accounts to connect with PMT & ACM alumni and track each other's paper portfolios (future)
